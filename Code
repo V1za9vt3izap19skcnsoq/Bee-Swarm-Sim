@@ -962,3 +962,1002 @@ ItemsTab:CreateToggle({
         end
     end,
 })
+
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Blue Extract",
+    Info = {
+        Title = 'Auto Use Blue Extract',
+        Image = '12735851647',
+        Description = 'Auto Uses Blue Extract For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoBlueExtract", 
+    Callback = function(Value)
+        if Value then
+            AutoBlueExtractLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Blue Extract"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(600) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoBlueExtractLoop then
+                task.cancel(AutoBlueExtractLoop)
+                AutoBlueExtractLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Red Extract",
+    Info = {
+        Title = 'Auto Use Red Extract',
+        Image = '12735851647',
+        Description = 'Auto Uses Red Extract For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoRedExtract", 
+    Callback = function(Value)
+        if Value then
+            AutoRedExtractLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Red Extract"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(600) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoRedExtractLoop then
+                task.cancel(AutoRedExtractLoop)
+                AutoRedExtractLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Glue",
+    Info = {
+        Title = 'Auto Use Glue',
+        Image = '12735851647',
+        Description = 'Auto Uses Glue For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoGlue", 
+    Callback = function(Value)
+        if Value then
+            AutoGlueLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Glue"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(600) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoGlueLoop then
+                task.cancel(AutoGlueLoop)
+                AutoGlueLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Oil",
+    Info = {
+        Title = 'Auto Use Oil',
+        Image = '12735851647',
+        Description = 'Auto Uses Oil For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoOil", 
+    Callback = function(Value)
+        if Value then
+            AutoOilLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Oil"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(600) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoOilLoop then
+                task.cancel(AutoOilLoop)
+                AutoOilLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Enzymes",
+    Info = {
+        Title = 'Auto Use Enzymes',
+        Image = '12735851647',
+        Description = 'Auto Uses Enzymes For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoEnzymes", 
+    Callback = function(Value)
+        if Value then
+            AutoEnzymesLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Enzymes"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(600) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoEnzymesLoop then
+                task.cancel(AutoEnzymesLoop)
+                AutoEnzymesLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Stinger",
+    Info = {
+        Title = 'Auto Use Stinger',
+        Image = '12735851647',
+        Description = 'Auto Uses Stinger For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoStinger", 
+    Callback = function(Value)
+        if Value then
+            AutoStingerLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Stinger"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(30) -- 30 seconds
+                end
+            end)
+        else
+            if AutoStingerLoop then
+                task.cancel(AutoStingerLoop)
+                AutoStingerLoop = nil
+            end
+        end
+    end,
+})
+
+-- Variables to control the loops
+local AutoTropicalDrinkLoop
+local AutoPurplePotionLoop
+local AutoSuperSmoothieLoop
+local AutoLoadedDiceLoop
+local AutoSmoothDiceLoop
+local AutoFieldDiceLoop
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Tropical Drink",
+    Info = {
+        Title = 'Auto Use Tropical Drink',
+        Image = '12735851647',
+        Description = 'Auto Uses Tropical Drink For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoTropicalDrink", 
+    Callback = function(Value)
+        if Value then
+            AutoTropicalDrinkLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Tropical Drink"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(600) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoTropicalDrinkLoop then
+                task.cancel(AutoTropicalDrinkLoop)
+                AutoTropicalDrinkLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Purple Potion",
+    Info = {
+        Title = 'Auto Use Purple Potion',
+        Image = '12735851647',
+        Description = 'Auto Uses Purple Potion For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoPurplePotion", 
+    Callback = function(Value)
+        if Value then
+            AutoPurplePotionLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Purple Potion"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(900) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoPurplePotionLoop then
+                task.cancel(AutoPurplePotionLoop)
+                AutoPurplePotionLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Super Smoothie",
+    Info = {
+        Title = 'Auto Use Super Smoothie',
+        Image = '12735851647',
+        Description = 'Auto Uses Super Smoothie For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoSuperSmoothie", 
+    Callback = function(Value)
+        if Value then
+            AutoSuperSmoothieLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Super Smoothie"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(1200) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoSuperSmoothieLoop then
+                task.cancel(AutoSuperSmoothieLoop)
+                AutoSuperSmoothieLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Loaded Dice",
+    Info = {
+        Title = 'Auto Use Loaded Dice',
+        Image = '12735851647',
+        Description = 'Auto Uses Loaded Dice For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoLoadedDice", 
+    Callback = function(Value)
+        if Value then
+            AutoLoadedDiceLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Loaded Dice"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(900) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoLoadedDiceLoop then
+                task.cancel(AutoLoadedDiceLoop)
+                AutoLoadedDiceLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Smooth Dice",
+    Info = {
+        Title = 'Auto Use Smooth Dice',
+        Image = '12735851647',
+        Description = 'Auto Uses Smooth Dice For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoSmoothDice", 
+    Callback = function(Value)
+        if Value then
+            AutoSmoothDiceLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Smooth Dice"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(900) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoSmoothDiceLoop then
+                task.cancel(AutoSmoothDiceLoop)
+                AutoSmoothDiceLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Field Dice",
+    Info = {
+        Title = 'Auto Use Field Dice',
+        Image = '12735851647',
+        Description = 'Auto Uses Field Dice For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoFieldDice", 
+    Callback = function(Value)
+        if Value then
+            AutoFieldDiceLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Field Dice"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(900) -- 600 seconds = 10 minutes
+                end
+            end)
+        else
+            if AutoFieldDiceLoop then
+                task.cancel(AutoFieldDiceLoop)
+                AutoFieldDiceLoop = nil
+            end
+        end
+    end,
+})
+
+local MiscTab = Window:CreateTab("Misc Tab", 4483362458)
+
+local DispensersTab = Window:CreateTab("Dispensers Tab", 4483362458)
+
+local dispensers = {
+    "Blueberry Dispenser",
+    "Free Robo Pass Dispenser",
+    "Free Ant Pass Dispenser",
+    "Honey Dispenser",
+    "Coconut Dispenser",
+    "Strawberry Dispenser",
+    "Treat Dispenser",
+    "Free Royal Jelly Dispenser",
+    "Glue Dispenser"
+}
+
+local function useDispenser(dispenser)
+    local args = { [1] = dispenser }
+    game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer(unpack(args))
+    print("Used:", dispenser)
+end
+
+local function useAllDispensers()
+    for _, dispenser in pairs(dispensers) do
+        useDispenser(dispenser)
+    end
+end
+
+local autoUseAllDispensers = false
+local autoUseTask
+
+DispensersTab:CreateButton({
+    Name = "Use All Dispensers",
+    Info = {
+        Title = 'Use All Dispensers',
+        Description = 'Uses All Dispensers in the game',
+    },
+    Interact = 'Changable',
+    Callback = function()
+        useAllDispensers()
+        print('All Dispensers Used')
+    end,
+})
+
+DispensersTab:CreateToggle({
+    Name = "Auto Use All Dispensers",
+    Info = {
+        Title = 'Auto Use All Dispensers',
+        Description = 'Automatically uses all dispensers in the game',
+    },
+    CurrentValue = false,
+    Flag = "AutoDispensers",
+    Callback = function(Value)
+        autoUseAllDispensers = Value
+        if autoUseAllDispensers then
+            autoUseTask = task.spawn(function()
+                while autoUseAllDispensers do
+                    useAllDispensers()
+                    task.wait(4.5)
+                end
+            end)
+        else
+            if autoUseTask then
+                task.cancel(autoUseTask)
+            end
+        end
+        print('Auto Use All Dispensers:', autoUseAllDispensers)
+    end,
+})
+
+for _, dispenser in pairs(dispensers) do
+    DispensersTab:CreateButton({
+        Name = "Use " .. dispenser,
+        Info = {
+            Title = 'Use ' .. dispenser,
+            Description = 'Uses ' .. dispenser .. ' in the game',
+        },
+        Interact = 'Changable',
+        Callback = function()
+            useDispenser(dispenser)
+            print(dispenser .. ' Used')
+        end,
+    })
+
+    local autoUseDispenser = false
+    local autoUseTask
+
+    DispensersTab:CreateToggle({
+        Name = "Auto Use " .. dispenser,
+        Info = {
+            Title = 'Auto Use ' .. dispenser,
+            Description = 'Automatically uses ' .. dispenser .. ' in the game',
+        },
+        CurrentValue = false,
+        Flag = "Auto" .. dispenser:gsub(" ", ""),
+        Callback = function(Value)
+            autoUseDispenser = Value
+            if autoUseDispenser then
+                autoUseTask = task.spawn(function()
+                    while autoUseDispenser do
+                        useDispenser(dispenser)
+                        task.wait(4.5)
+                    end
+                end)
+            else
+                if autoUseTask then
+                    task.cancel(autoUseTask)
+                end
+            end
+            print('Auto Use ' .. dispenser .. ':', autoUseDispenser)
+        end,
+    })
+end
+
+local BeesMasTab = Window:CreateTab("Bees Mas Tab", 4483362458) -- Title, Image
+
+local enabled = false
+
+local function getsnowflake()
+    local path = workspace:WaitForChild("Particles"):WaitForChild("Snowflakes")
+    if #path:GetChildren() ~= 0 then
+        return path:GetChildren()[math.random(1, #path:GetChildren())]
+    else
+        task.wait(0.1)
+        return getsnowflake()
+    end
+end
+
+local function farmSnowflakes()
+    while enabled do
+        local lplr = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+        local selectedsnowflake = getsnowflake()
+        local collecttick = tick()
+        repeat task.wait()
+            local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut) -- Adjusting tween duration to 0.5 seconds for faster movement
+            game:GetService("TweenService"):Create(lplr.HumanoidRootPart, tweenInfo, {CFrame = selectedsnowflake.CFrame + Vector3.new(0, 15, 0)}):Play()
+            lplr.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+        until (tick() - collecttick > 2) or not enabled -- Reducing the time before collecting the next snowflake
+        task.wait(2) -- Reducing the wait time before collecting the next snowflake
+    end
+end
+
+BeesMasTab:CreateToggle({
+    Name = "Auto Farm SnowFlakes",
+    Info = {
+        Title = 'Auto Farm SnowFlakes',
+        Image = '12735851647',
+        Description = 'Auto Farms SnowFlakes For You epic',
+    },
+    CurrentValue = false,
+    Flag = "SnowFlakesAutoFarmm",
+    Callback = function(Value)
+        enabled = Value
+        if enabled then
+            farmSnowflakes()
+        end
+    end,
+})
+
+Tab:CreateButton({
+    Name = "Collect All Stickers",
+    Info = {
+        Title = 'Collect Hidden Stickers',
+        Description = 'Collects All Stickers In the game',
+    },
+    Interact = 'Collect',
+    Callback = function()
+        local hiddenStickers = workspace:WaitForChild("HiddenStickers")
+        for _, v in hiddenStickers:GetChildren() do
+            fireclickdetector(v.ClickDetector)
+        end
+    end,
+})
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+
+MiscTab:CreateInput({
+    Name = "Server Link Here",
+    PlaceholderText = "Put the link you got from the discord here",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local function extractJobId(link)
+            local jobIdPattern = "jobId=([%w-]+)"
+            local jobId = string.match(link, jobIdPattern)
+            return jobId
+        end
+
+        local jobId = extractJobId(Text)
+        if jobId then
+            local placeId = 1537690962 -- Replace with your placeId if different
+            TeleportService:TeleportToPlaceInstance(placeId, jobId, Players.LocalPlayer)
+        else
+            print("Invalid server link")
+        end
+    end,
+})
+
+-- Variable to control the checking loop
+local isCheckingWindyBee = true
+local isCheckingViciousBee = true
+
+CombatTab:CreateToggle({
+    Name = "Notify When Windy Bee Spawns",
+    Info = {
+        Title = 'Slider template',
+        Image = '12735851647',
+        Description = 'Just a slider for stuff',
+    },
+    CurrentValue = true, -- Default value is set to true
+    Flag = "WindyBeeNotify", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        isCheckingWindyBee = Value
+
+        if Value then
+            spawn(function()
+                while wait(1) and isCheckingWindyBee do
+                    local npcBees = game.Workspace:FindFirstChild("NPCBees")
+                    if npcBees then
+                        local windyBee = npcBees:FindFirstChild("Windy")
+                        if windyBee then
+                            ArrayField:Notify({
+                                Title = "A Windy Bee Has Spawned",
+                                Content = "A Windy Bee Has Spawned in your server",
+                                Duration = 6.5,
+                                Image = 4483362458,
+                                Actions = {
+                                    Ignore = {
+                                        Name = "Okay!",
+                                        Callback = function()
+                                            print("The user tapped Okay!")
+                                        end
+                                    },
+                                },
+                            })
+                            break -- Stop checking after the notification is sent
+                        end
+                    end
+                end
+            end)
+        end
+    end,
+})
+
+CombatTab:CreateToggle({
+    Name = "Notify When Vicious bee spawns",
+    Info = {
+        Title = 'Slider template',
+        Image = '12735851647',
+        Description = 'Just a slider for stuff',
+    },
+    CurrentValue = true, -- Default value is set to false
+    Flag = "ViciousBeeNotify", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        isCheckingViciousBee = Value
+
+        if Value then
+            spawn(function()
+                while wait(1) and isCheckingViciousBee do
+                    local particles = game.Workspace:FindFirstChild("Particles")
+                    if particles then
+                        local wts = particles:FindFirstChild("WTs")
+                        if wts then
+                            local waitingThorn = wts:FindFirstChild("WaitingThorn")
+                            if waitingThorn then
+                                ArrayField:Notify({
+                                    Title = "A Vicious bee has Spawned",
+                                    Content = "A Vicious bee has Spawned in your server",
+                                    Duration = 6.5,
+                                    Image = 4483362458,
+                                    Actions = {
+                                        Ignore = {
+                                            Name = "Okay!",
+                                            Callback = function()
+                                                print("The user tapped Okay!")
+                                            end
+                                        },
+                                    },
+                                })
+                                break -- Stop checking after the notification is sent
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end,
+})
+
+function reduceLag()
+    -- Lower rendering quality level
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+    
+    -- Terrain settings
+    Workspace.Terrain.WaterWaveSize = 0
+    Workspace.Terrain.WaterWaveSpeed = 0
+    Workspace.Terrain.WaterReflectance = 0
+    Workspace.Terrain.WaterTransparency = 0
+    
+    -- Adjusting properties of parts
+    for _, v in pairs(Workspace:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("WedgePart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+            v.Material = Enum.Material.Plastic
+            v.Reflectance = 0
+            v.CastShadow = false  -- Disable shadows
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Enabled = false  -- Disable particle emitters
+        end
+    end
+    
+    -- Lower graphics settings
+    game.Lighting.GlobalShadows = false
+    game.Lighting.FogEnd = 100000  -- Max fog distance
+    
+    -- Reduce render distance
+    game.Players.LocalPlayer.CameraMaxZoomDistance = 50  -- Example value, adjust as needed
+    
+    print('Lag')
+end
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local HiveTab = Window:CreateTab("Hive Tab", 4483362458)
+
+local beePosTexts = {}
+local autoGiftedBasicBeeRunning = false
+local xPosInput, yPosInput = 2, 2
+local giftedMethod = "Basic Eggs"
+
+local function showBeePositions()
+    for _, text in pairs(beePosTexts) do
+        text:Destroy()
+    end
+    table.clear(beePosTexts)
+
+    local honeycombs = game:GetService("Workspace"):FindFirstChild("Honeycombs")
+    if not honeycombs then 
+        print("Honeycombs not found in Workspace.")
+        return 
+    end
+
+    for _, hive in ipairs(honeycombs:GetChildren()) do
+        if string.match(hive.Name, "^Hive%d+$") then
+            local cells = hive:FindFirstChild("Cells")
+            if cells then
+                for _, cellContainer in ipairs(cells:GetChildren()) do
+                    local cellX = cellContainer:FindFirstChild("CellX")
+                    local cellY = cellContainer:FindFirstChild("CellY")
+
+                    if cellX and cellY then
+                        local billboardGui = Instance.new("BillboardGui")
+                        billboardGui.Adornee = cellContainer
+                        billboardGui.Size = UDim2.new(0, 100, 0, 50)
+                        billboardGui.AlwaysOnTop = true
+                        billboardGui.Parent = cellContainer
+
+                        local textLabel = Instance.new("TextLabel")
+                        textLabel.Size = UDim2.new(1, 0, 1, 0)
+                        textLabel.BackgroundTransparency = 1
+                        textLabel.Text = "X: " .. tostring(cellX.Value) .. " Y: " .. tostring(cellY.Value)
+                        textLabel.TextColor3 = Color3.new(1, 1, 1)
+                        textLabel.TextStrokeTransparency = 0
+                        textLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+                        textLabel.Parent = billboardGui
+
+                        table.insert(beePosTexts, billboardGui)
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function hideBeePositions()
+    for _, text in pairs(beePosTexts) do
+        text:Destroy()
+    end
+    table.clear(beePosTexts)
+end
+
+HiveTab:CreateToggle({
+    Name = "Show Bee Positions",
+    Info = {
+        Title = 'Show Bee Positions',
+        Image = '12735851647',
+        Description = 'Shows the positions of your bees so you know the x and y pos put numbers only in the text inputs'
+    },
+    CurrentValue = false,
+    Flag = "ShowBeePos",
+    Callback = function(Value)
+        if Value then
+            showBeePositions()
+        else
+            hideBeePositions()
+        end
+    end,
+})
+
+HiveTab:CreateDropdown({
+    Name = "Auto Gifted Basic Bee Method",
+    Options = {"Royal Jelly", "Basic Eggs"},
+    CurrentOption = "Basic Eggs",
+    MultiSelection = false,
+    Flag = "GiftedBasicMethod",
+    Callback = function(Option)
+        giftedMethod = Option
+        print("Selected Method: " .. Option)
+    end,
+})
+
+HiveTab:CreateInput({
+    Name = "X Pos For Gifted Basic",
+    PlaceholderText = "The X Pos the auto gifted basic bee should do it on",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        xPosInput = tonumber(Text) or 2
+        print("X Position set to: " .. tostring(xPosInput))
+    end,
+})
+
+HiveTab:CreateInput({
+    Name = "Y Pos For Gifted Basic",
+    PlaceholderText = "The Y Pos the Auto Gifted Basic Bee Should do it at",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        yPosInput = tonumber(Text) or 2
+        print("Y Position set to: " .. tostring(yPosInput))
+    end,
+})
+
+local function startAutoGiftedBasicBee()
+    autoGiftedBasicBeeRunning = true
+    while autoGiftedBasicBeeRunning do
+        local honeycombValue = player:FindFirstChild("Honeycomb") and player.Honeycomb.Value
+        local hive = game:GetService("Workspace"):FindFirstChild("Honeycombs"):FindFirstChild(honeycombValue)
+
+        if hive then
+            local cells = hive:FindFirstChild("Cells")
+            if cells then
+                for _, cell in ipairs(cells:GetChildren()) do
+                    local giftedCell = cell:FindFirstChild("GiftedCell")
+                    local cellType = cell:FindFirstChild("CellType")
+                    if giftedCell and cellType and cellType.Value == "BasicBee" then
+                        print("Gifted Basic Bee cell found. Stopping auto gifted basic bee.")
+                        autoGiftedBasicBeeRunning = false
+                        return
+                    end
+                end
+            end
+        end
+
+        local args
+        if giftedMethod == "Basic Eggs" then
+            args = {
+                [1] = xPosInput,
+                [2] = yPosInput,
+                [3] = "Basic",
+                [4] = 1,
+                [5] = false
+            }
+        else
+            args = {
+                [1] = xPosInput,
+                [2] = yPosInput,
+                [3] = "RoyalJelly",
+                [4] = 1,
+                [5] = false
+            }
+        end
+
+        game:GetService("ReplicatedStorage").Events.ConstructHiveCellFromEgg:InvokeServer(unpack(args))
+        wait(1.5)
+    end
+end
+
+HiveTab:CreateToggle({
+    Name = "Start Auto Gifted Basic Bee",
+    Info = {
+        Title = 'Start Auto Gifted Basic Bee',
+        Image = '12735851647',
+        Description = 'Starts the auto gifted basic this is op also stops when you get it so no need to turn off the toggle'
+    },
+    CurrentValue = false,
+    Flag = "StartAutoGiftedBasiccc",
+    Callback = function(Value)
+        if Value then
+            startAutoGiftedBasicBee()
+        else
+            autoGiftedBasicBeeRunning = false
+        end
+    end,
+})
+
+-- Button setup
+MiscTab:CreateButton({
+    Name = "Reduce Lag",
+    Info = {
+        Title = 'Less Lag',
+        Description = 'reduces lag in the game.',
+    },
+    Interact = 'Changable',
+    Callback = function()
+        reduceLag()
+    end,
+})
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local coreStats = player:WaitForChild("CoreStats")
+local honeyValue = coreStats:WaitForChild("Honey")
+local pollenValue = coreStats:WaitForChild("Pollen")
+
+local webhookUrl = "" -- Initialize as empty string, updated by user input
+local discordId = "" -- Initialize as empty string, updated by user input
+local sendMessages = false
+local pingUser = false
+local showHoneyPerHour = false
+local showDailyHoney = false
+local showCurrentPollen = false
+local embedColor = Color3.fromRGB(0, 0, 139) -- Default color set to dark blue
+
+local data = {
+    startTime = tick(),
+    lastHoneyValue = honeyValue.Value,
+    totalHoneyProduced = 0,
+    totalElapsedTime = 0
+}
+
+local function formatNumberWithCommas(value)
+    local formatted = tostring(math.floor(value))
+    while true do  
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then break end
+    end
+    return formatted
+end
+
+local function updateHoneyStats()
+    local currentTime = tick()
+    local currentHoneyValue = honeyValue.Value
+
+    local honeyProduced = currentHoneyValue - data.lastHoneyValue
+    local sessionElapsedTime = currentTime - data.startTime
+
+    data.totalHoneyProduced = data.totalHoneyProduced + honeyProduced
+    data.totalElapsedTime = sessionElapsedTime
+
+    local honeyPerSecond = data.totalHoneyProduced / data.totalElapsedTime
+    local honeyPerHour = math.floor(honeyPerSecond * 3600)
+    local honeyPerDay = math.floor(honeyPerHour * 24)
+
+    data.lastHoneyValue = currentHoneyValue
+    data.startTime = currentTime
+
+    return {
+        honeyPerHour = honeyPerHour,
+        honeyPerDay = honeyPerDay,
+        currentPollen = math.floor(pollenValue.Value)
+    }
+end
+
+local function sendWebhookMessage()
+    if sendMessages and webhookUrl ~= "" then
+        local stats = updateHoneyStats()
+
+        local embed = {
+            title = "Rinns Hub Data Reporter",
+            description = "",
+            color = tonumber(embedColor:ToHex(), 16), -- Convert Color3 to hex
+            fields = {}
+        }
+
+        if showHoneyPerHour then
+            table.insert(embed.fields, {
+                name = "Honey Per Hour",
+                value = formatNumberWithCommas(stats.honeyPerHour),
+                inline = true
+            })
+        end
+
+        if showDailyHoney then
+            table.insert(embed.fields, {
+                name = "Daily Honey",
+                value = formatNumberWithCommas(stats.honeyPerDay),
+                inline = true
+            })
+        end
+
+        if showCurrentPollen then
+            table.insert(embed.fields, {
+                name = "Current Pollen",
+                value = formatNumberWithCommas(stats.currentPollen),
+                inline = true
+            })
+        end
+
+        local msg = {
+            ["embeds"] = {embed}
+        }
+
+        if pingUser and discordId ~= "" then
+            -- Send a normal message to ping the user
+            local pingMessage = {
+                content = string.format("<@%s> Rinns Hub Data Reporter", discordId)
+            }
+            HttpService:JSONEncode(pingMessage)
+            request({
+                Url = webhookUrl,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json",
+                },
+                Body = HttpService:JSONEncode(pingMessage),
+            })
+        end
