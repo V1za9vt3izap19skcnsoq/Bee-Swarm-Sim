@@ -1961,3 +1961,801 @@ local function sendWebhookMessage()
                 Body = HttpService:JSONEncode(pingMessage),
             })
         end
+
+
+
+        -- Send the main embed message
+        request({
+            Url = webhookUrl,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json",
+            },
+            Body = HttpService:JSONEncode(msg),
+        })
+
+        print("Message sent to the webhook.")
+    end
+end
+
+local function onWebhookUrlChanged(newUrl)
+    webhookUrl = newUrl
+    print("Webhook URL updated to:", webhookUrl)
+end
+
+local WebhookTab = Window:CreateTab("Webhook Tab", 4483362458)
+
+local Label = WebhookTab:CreateLabel("Thank kylosilly on discord for making the calculations on skibidi",Section)
+
+WebhookTab:CreateInput({
+    Name = "Webhook Url",
+    PlaceholderText = "webhook url here dumbass",
+    RemoveTextAfterFocusLost = false,
+    Callback = onWebhookUrlChanged
+})
+
+WebhookTab:CreateInput({
+    Name = "Discord user id",
+    PlaceholderText = "user id to ping",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(id)
+        discordId = id
+        print("Discord ID updated to:", discordId)
+    end
+})
+
+WebhookTab:CreateButton({
+    Name = "Test Webhook",
+    Info = {
+        Title = 'Test Webhook',
+        Description = 'Tests the Webhook shi',
+    },
+    Interact = 'Changeable',
+    Callback = function()
+        sendWebhookMessage()
+        print("Test message sent.")
+    end,
+})
+
+WebhookTab:CreateToggle({
+    Name = "Send Messages to webhook",
+    Info = {
+        Title = 'Send Messages to webhook',
+        Description = 'Sends Messages to the webhook',
+    },
+    CurrentValue = false,
+    Flag = "SendMessages",
+    Callback = function(value)
+        sendMessages = value
+        print("Send Messages:", sendMessages)
+    end,
+})
+
+WebhookTab:CreateToggle({
+    Name = "Ping Discord User Id",
+    Info = {
+        Title = 'Ping Discord User Id',
+        Description = 'Pingd The Discord User Id',
+    },
+    CurrentValue = false,
+    Flag = "PingUser",
+    Callback = function(value)
+        pingUser = value
+        print("Ping User:", pingUser)
+    end,
+})
+
+WebhookTab:CreateColorPicker({
+    Name = "Message Embed Color",
+    Color = embedColor,
+    Flag = "EmbedColor",
+    Callback = function(color)
+        embedColor = color
+        print("Embed color updated.")
+    end,
+})
+
+WebhookTab:CreateToggle({
+    Name = "Show Honey Per Hour",
+    Info = {
+        Title = 'Show Honey Per Hour',
+        Description = 'Shows Your Honey Per Hour in the messages',
+    },
+    CurrentValue = false,
+    Flag = "ShowHoneyPerHour",
+    Callback = function(value)
+        showHoneyPerHour = value
+    end,
+})
+
+WebhookTab:CreateToggle({
+    Name = "Show Daily Honey",
+    Info = {
+        Title = 'Show Daily Honey',
+        Description = 'Shows Your Daily Honey in the message',
+    },
+    CurrentValue = false,
+    Flag = "ShowDailyHoney",
+    Callback = function(value)
+        showDailyHoney = value
+    end,
+})
+
+WebhookTab:CreateToggle({
+    Name = "Show Current Pollen",
+    Info = {
+        Title = 'Show Current Pollen',
+        Description = 'Shows Your Current Pollen In the messages',
+    },
+    CurrentValue = false,
+    Flag = "ShowCurrentPollen",
+    Callback = function(value)
+        showCurrentPollen = value
+    end,
+})
+
+WebhookTab:CreateSlider({
+    Name = "Message Interval",
+    Range = {1, 60},
+    Increment = 1,
+    Suffix = "Minutes",
+    CurrentValue = 10,
+    Flag = "MessageInterval",
+    Callback = function(interval)
+        task.spawn(function()
+            while sendMessages do
+                sendWebhookMessage()
+                task.wait(interval * 60)
+            end
+        end)
+    end,
+})
+
+local Label = WebhookTab:CreateLabel("More To Be Added since this tab had to be rushed",Section)
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+BeesMasTab:CreateToggle({
+    Name = "Auto Use Gingerbread House",
+    Info = {
+        Title = 'Auto Use Gingerbread House',
+        Image = '12735851647',
+        Description = 'Automatically uses the Gingerbread House',
+    },
+    CurrentValue = false,
+    Flag = "AutoUseGingerbreadHouse",
+    Callback = function(Value)
+        if Value then
+            spawn(function()
+                while Value do
+                    local args = { [1] = "Gingerbread House" }
+                    game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer(unpack(args))
+                    wait(600) -- 600 seconds = 10 minutes
+                end
+            end)
+        end
+    end,
+})
+
+local honeyWreathLastRunTime = 0
+local beesmasFeastLastRunTime = 0
+local honeyWreathCooldown = 30 * 60 -- 30 minutes in seconds
+local beesmasFeastCooldown = 90 * 60 -- 1 hour 30 minutes in seconds
+
+local function tweenToPosition(targetPosition)
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
+    local currentPosition = humanoidRootPart.Position
+    local distance = (targetPosition - currentPosition).Magnitude
+    local speed = 65 -- Set tween speed to 65 studs per second
+    local duration = distance / speed
+
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(humanoidRootPart, tweenInfo, {CFrame = CFrame.new(targetPosition)})
+    tween:Play()
+    tween.Completed:Wait()
+end
+
+local function collectClosestCollectibles(range, duration, specificColor)
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    
+    local startTime = tick()
+
+    while tick() - startTime < duration do
+        local collectibles = Workspace:WaitForChild("Collectibles"):GetChildren()
+        local targetCollectible = nil
+        local closestDistance = range
+
+        for _, collectible in ipairs(collectibles) do
+            if collectible:IsA("BasePart") then
+                local distance = (collectible.Position - hrp.Position).Magnitude
+                local correctColor = not specificColor or collectible.Color == Color3.fromRGB(223, 187, 27)
+                if correctColor and distance < closestDistance then
+                    closestDistance = distance
+                    targetCollectible = collectible
+                end
+            end
+        end
+
+        if targetCollectible then
+            humanoid:MoveTo(targetCollectible.Position)
+            local success, _ = humanoid.MoveToFinished:Wait()
+            if not success then
+                break -- Exit loop if the movement fails
+            end
+            wait(0.1) -- Small delay before moving to the next collectible
+        else
+            break -- Exit loop if no target collectible is found
+        end
+    end
+end
+
+local function doHoneyWreath()
+    tweenToPosition(Vector3.new(-281.072998046875, 19.15363121032715, 346.1036071777344)) -- Slow tween
+    local args = { [1] = "Honey Wreath" }
+    ReplicatedStorage.Events.ToyEvent:FireServer(unpack(args))
+    collectClosestCollectibles(12, 10, true) -- Collect for 10 seconds, only specific color
+end
+
+local function doBeesmasFeast()
+    tweenToPosition(Vector3.new(-107.03587341308594, 128.84361267089844, -114.3899154663086)) -- Slow tween
+    local args = { [1] = "Beesmas Feast" }
+    ReplicatedStorage.Events.ToyEvent:FireServer(unpack(args))
+    collectClosestCollectibles(13, 10, false) -- Collect for 10 seconds, any color
+end
+
+BeesMasTab:CreateToggle({
+    Name = "Auto Do Honey Wreath",
+    Info = {
+        Title = 'Auto Do Honey Wreath',
+        Image = '12735851647',
+        Description = 'Automatically uses the Honey Wreath',
+    },
+    CurrentValue = false,
+    Flag = "AutoDoHoneyWreath",
+    Callback = function(Value)
+        if Value then
+            spawn(function()
+                while Value do
+                    local currentTime = tick()
+                    local timeSinceLastRun = currentTime - honeyWreathLastRunTime
+
+                    if timeSinceLastRun >= honeyWreathCooldown then
+                        doHoneyWreath()
+                        honeyWreathLastRunTime = currentTime
+                    else
+                        wait(honeyWreathCooldown - timeSinceLastRun)
+                        if Value then
+                            doHoneyWreath()
+                            honeyWreathLastRunTime = tick()
+                        end
+                    end
+                    wait(honeyWreathCooldown)
+                end
+            end)
+        end
+    end,
+})
+
+BeesMasTab:CreateToggle({
+    Name = "Auto BeesMas Feast",
+    Info = {
+        Title = 'Auto BeesMas Feast',
+        Image = '12735851647',
+        Description = 'Automatically does Beesmas Feast',
+    },
+    CurrentValue = false,
+    Flag = "AutoBeesmasFeast",
+    Callback = function(Value)
+        if Value then
+            spawn(function()
+                while Value do
+                    local currentTime = tick()
+                    local timeSinceLastRun = currentTime - beesmasFeastLastRunTime
+
+                    if timeSinceLastRun >= beesmasFeastCooldown then
+                        doBeesmasFeast()
+                        beesmasFeastLastRunTime = currentTime
+                    else
+                        wait(beesmasFeastCooldown - timeSinceLastRun)
+                        if Value then
+                            doBeesmasFeast()
+                            beesmasFeastLastRunTime = tick()
+                        end
+                    end
+                    wait(beesmasFeastCooldown)
+                end
+            end)
+        end
+    end,
+})
+
+MiscTab:CreateButton({
+    Name = "Remove Gates And Fenches",
+    Info = {
+        Title = 'Remove Gates and Fenches',
+        Description = 'Removes Every Gate and Fences in the game',
+    },
+    Interact = 'Changable',
+    Callback = function()
+        print('Pressed')
+
+        local fences = game.Workspace:WaitForChild("Map"):WaitForChild("Fences")
+        for _, item in pairs(fences:GetChildren()) do
+            item:Destroy()
+        end
+
+        local gates = game.Workspace:WaitForChild("Gates")
+        for _, item in pairs(gates:GetChildren()) do
+            item:Destroy()
+        end
+    end,
+})
+
+local selectedItem = "Glitter"
+local donationAmount = 1
+local donationRunning = false
+local autoDonateConnection
+
+local function donateToWindShrine()
+    local args = {
+        [1] = selectedItem,
+        [2] = donationAmount
+    }
+    game:GetService("ReplicatedStorage").Events.WindShrineDonation:InvokeServer(unpack(args))
+    wait(1) -- Wait for 1 second before triggering
+    game:GetService("ReplicatedStorage").Events.WindShrineTrigger:FireServer()
+end
+
+Tab:CreateToggle({
+    Name = "Auto Donate To WindShrine",
+    Info = {
+        Title = 'Auto Donate To WindShrine',
+        Image = '12735851647',
+        Description = 'Automatically donates the selected item in the dropdown below to the windshrine',
+    },
+    CurrentValue = false,
+    Flag = "AutoDonateToWind",
+    Callback = function(Value)
+        donationRunning = Value
+        if donationRunning then
+            autoDonateConnection = game:GetService("RunService").Stepped:Connect(function()
+                if donationRunning then
+                    donateToWindShrine()
+                else
+                    autoDonateConnection:Disconnect()
+                end
+                wait(5)
+            end)
+        else
+            if autoDonateConnection then
+                autoDonateConnection:Disconnect()
+            end
+        end
+    end,
+})
+
+Tab:CreateDropdown({
+    Name = "Item To Donate",
+    Options = {"Glitter", "Pineapple", "GiftedSilver", "Stinger", "BlueExtract", "Star", "SunflowerSeed", "Coconut", 
+               "CausticWax", "Diamond", "Neonberry", "StarJelly", "FestiveBean", "Mythic", "Turpentine", "Gold",
+               "SmoothDice", "JellyBeans", "SoftWax", "HoneyBee", "MagicBean", "GiftedGold", "Enzymes", "Bitterberry",
+               "LoadedDice", "Strawberry", "Ticket", "Silver", "Whirligig", "SpiritPetal", "HardWax", "DebugWax",
+               "NightBell", "FieldDice", "TropicalDrink", "AtomicTreat", "RoyalJelly", "MythicJelly", "Basic", 
+               "RedExtract", "Glue", "MarshmallowBee", "CloudVial", "MoonCharm", "StarTreat", "Blueberry", "Oil",
+               "Treat", "Gumdrops", "GiftedDiamond", "Honeysuckle", "AntPass", "Box-O-Frogs", "Micro-Converter",
+               "GiftedMythic", "PurplePotion", "SwirledWax"}, -- Added new options
+    CurrentOption = "Glitter",
+    MultiSelection = false,
+    Flag = "Dropdown2",
+    Callback = function(Option)
+        selectedItem = Option
+    end,
+})
+
+Tab:CreateInput({
+    Name = "Amount To Donate",
+    PlaceholderText = "The Amount Of Items To Donate to windshrine",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local amount = tonumber(Text)
+        if amount then
+            donationAmount = amount
+        else
+            donationAmount = 1
+        end
+    end,
+})
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+local Humanoid = Character:WaitForChild("Humanoid")
+
+local twspeed = 60
+local targetPosition1 = Vector3.new(176.94158935546875, 4.547196865081787, 157.11050415039062)
+local targetPosition2 = Vector3.new(109.0298843383789, 4.547195911407471, 253.4846649169922)
+local commandoPosition = Vector3.new(495.7022399902344, 46.98208236694336, 164.57131958007812)
+local tweenInfo = TweenInfo.new((HumanoidRootPart.Position - targetPosition1).Magnitude / twspeed, Enum.EasingStyle.Linear)
+local commandoTweenInfo = TweenInfo.new((HumanoidRootPart.Position - commandoPosition).Magnitude / twspeed, Enum.EasingStyle.Linear)
+local timerDuration = 234000
+local remainingTime = timerDuration
+local timerRunning = false
+local toggleActive = false
+local commandoActive = false
+local commandoTween
+
+local function saveTime()
+    Window:SetValue("TimerRemainingTime", remainingTime)
+end
+
+local function resumeTime()
+    remainingTime = Window:GetValue("TimerRemainingTime") or timerDuration
+end
+
+local function moveToPosition()
+    local tween = TweenService:Create(HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(targetPosition1)})
+    tween:Play()
+    tween.Completed:Wait()
+
+    Humanoid:MoveTo(targetPosition2)
+    Humanoid.MoveToFinished:Wait()
+end
+
+local function startTimer()
+    timerRunning = true
+    while remainingTime > 0 and toggleActive do
+        wait(1)
+        remainingTime -= 1
+        saveTime()
+    end
+
+    if remainingTime <= 0 and toggleActive then
+        remainingTime = timerDuration
+        moveToPosition()
+        startTimer()
+    end
+end
+
+local function stopCommandoFollow()
+    if commandoTween then
+        commandoTween:Cancel()
+        commandoTween = nil
+    end
+end
+
+local function startCommandoFollow()
+    local function updateCommandoPosition()
+        if not commandoActive then return end
+        local monsters = workspace:FindFirstChild("Monsters")
+        if monsters then
+            for _, monster in pairs(monsters:GetChildren()) do
+                if string.find(monster.Name, "Commando") then
+                    local commandoPos = monster.Position + Vector3.new(0, 6, 0)
+                    local tweenInfo = TweenInfo.new((HumanoidRootPart.Position - commandoPos).Magnitude / twspeed, Enum.EasingStyle.Linear)
+                    commandoTween = TweenService:Create(HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(commandoPos)})
+                    commandoTween:Play()
+                    commandoTween.Completed:Connect(updateCommandoPosition)
+                    return
+                end
+            end
+        end
+        wait(0.1)
+        updateCommandoPosition()
+    end
+
+    local tween = TweenService:Create(HumanoidRootPart, commandoTweenInfo, {CFrame = CFrame.new(commandoPosition)})
+    tween:Play()
+    tween.Completed:Wait()
+    updateCommandoPosition()
+end
+
+CombatTab:CreateToggle({
+    Name = "Auto Kill King Beetle",
+    CurrentValue = false,
+    Flag = "AutoKillKing",
+    Callback = function(Value)
+        toggleActive = Value
+        if Value then
+            resumeTime()
+            moveToPosition()
+            if not timerRunning then
+                startTimer()
+            end
+        else
+            saveTime()
+            timerRunning = false
+        end
+    end,
+})
+
+CombatTab:CreateToggle({
+    Name = "Auto Kill Commando Chick",
+    CurrentValue = false,
+    Flag = "AutoKillChick",
+    Callback = function(Value)
+        commandoActive = Value
+        if Value then
+            startCommandoFollow()
+        else
+            stopCommandoFollow()
+        end
+    end,
+})
+
+local MonsterEsp = false
+local MonstersEsp = {}
+local currentColor = Color3.fromRGB(150, 50, 200)  -- Default bluish-red color
+
+local function updateESP()
+    for _, esp in pairs(MonstersEsp) do
+        esp.Line:Remove()
+        esp.Text:Remove()
+    end
+    MonstersEsp = {}
+
+    if not MonsterEsp then return end
+
+    local camera = workspace.CurrentCamera
+
+    for _, monster in pairs(workspace.Monsters:GetChildren()) do
+        if monster:IsA("Model") and monster:FindFirstChild("HumanoidRootPart") then
+            local monsterHRP = monster.HumanoidRootPart
+
+            local line = Drawing.new("Line")
+            line.Color = currentColor
+            line.Thickness = 2
+            line.Transparency = 1
+            line.Visible = true
+
+            local text = Drawing.new("Text")
+            text.Text = monster.Name
+            text.Size = 25 
+            text.Color = Color3.fromRGB(255, 255, 255)
+            text.Outline = true
+            text.OutlineColor = Color3.fromRGB(0, 0, 0)
+            text.Center = true
+            text.Visible = true
+
+            table.insert(MonstersEsp, {Line = line, Text = text, Monster = monsterHRP})
+        end
+    end
+end
+
+local function updateAllESP()
+    local camera = workspace.CurrentCamera
+
+    for _, esp in pairs(MonstersEsp) do
+        local monsterHRP = esp.Monster
+
+        if monsterHRP.Parent == nil then
+            esp.Line.Visible = false
+            esp.Text.Visible = false
+        else
+            local monsterPosition = monsterHRP.Position
+            local screenPosition, onScreen = camera:WorldToViewportPoint(monsterPosition)
+            local textPosition, onScreenText = camera:WorldToViewportPoint(monsterPosition + Vector3.new(0, 8, 0))
+
+            if onScreen and onScreenText then
+                esp.Line.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
+                esp.Line.To = Vector2.new(screenPosition.X, screenPosition.Y)
+                esp.Line.Visible = true
+
+                esp.Text.Position = Vector2.new(textPosition.X, textPosition.Y)
+                esp.Text.Visible = true
+            else
+                esp.Line.Visible = false
+                esp.Text.Visible = false
+            end
+        end
+    end
+end
+
+game:GetService("RunService").Heartbeat:Connect(updateAllESP)
+
+EspTab:CreateToggle({
+    Name = "Esp Monsters",
+    Info = {
+        Title = 'Esp Monsters',
+        Image = '12735851647',
+        Description = 'Shows You where every spawned in monster is',
+    },
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        MonsterEsp = Value
+        updateESP()
+    end,
+})
+
+local ColorPicker = EspTab:CreateColorPicker({
+    Name = "Monster Esp Color",
+    Color = currentColor,
+    Flag = "ColorPicker1",
+    Callback = function(Value)
+        currentColor = Value
+        for _, esp in pairs(MonstersEsp) do
+            esp.Line.Color = currentColor
+        end
+    end
+})
+
+workspace.Monsters.ChildAdded:Connect(updateESP)
+workspace.Monsters.ChildRemoved:Connect(updateESP)
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+local Humanoid = Character:WaitForChild("Humanoid")
+
+local MonstersToFarm = {"LadyBugs", "Beetles"}
+local MonstersAutoFarm = false
+local tweeenspeeeed = 55
+
+local cooldowns = {
+    ["LadyBugs"] = 300,
+    ["Beetles"] = 300,
+    ["Spider"] = 1800,
+    ["Werewolf"] = 3600,
+    ["Scorpions"] = 1200,
+    ["Mantises"] = 1200
+}
+
+local lastFarmTime = {
+    ["LadyBugs"] = 0,
+    ["Beetles"] = 0,
+    ["Spider"] = 0,
+    ["Werewolf"] = 0,
+    ["Scorpions"] = 0,
+    ["Mantises"] = 0
+}
+
+local restingPosition = Vector3.new(62.26613235473633, 23.552186965942383, 149.33602905273438)
+
+local function TweenToPosition(position)
+    local tweenInfo = TweenInfo.new((HumanoidRootPart.Position - position).Magnitude / tweeenspeeeed, Enum.EasingStyle.Linear)
+    local tween = TweenService:Create(HumanoidRootPart, tweenInfo, {CFrame = CFrame.new(position)})
+    tween:Play()
+    tween.Completed:Wait()
+end
+
+local function CollectNearbyCollectibles(range)
+    local collectibles = game.Workspace.Collectibles:GetChildren()
+    for _, collectible in ipairs(collectibles) do
+        if (collectible.Position - HumanoidRootPart.Position).Magnitude <= range then
+            Humanoid:MoveTo(collectible.Position)
+            Humanoid.MoveToFinished:Wait()
+            wait(0.1)
+            break
+        end
+    end
+end
+
+local function FarmLadyBugs()
+    TweenToPosition(Vector3.new(-103.90493774414062, 4.447190761566162, 112.54106140136719))
+    wait(5)
+    CollectNearbyCollectibles(30)
+    TweenToPosition(Vector3.new(144.44790649414062, 33.94718551635742, 216.9700164794922))
+    wait(5)
+    CollectNearbyCollectibles(30)
+    TweenToPosition(Vector3.new(-179.0970001220703, 20.447189331054688, -0.866769552230835))
+    wait(5)
+    CollectNearbyCollectibles(30)
+end
+
+local function FarmBeetles()
+    TweenToPosition(Vector3.new(157.0131378173828, 33.94718551635742, 181.63157653808594))
+    wait(5)
+    CollectNearbyCollectibles(30)
+    TweenToPosition(Vector3.new(116.6709976196289, 4.447190761566162, 100.08097076416016))
+    wait(5)
+    CollectNearbyCollectibles(30)
+    TweenToPosition(Vector3.new(110.57367706298828, 20.447189331054688, -33.61347961425781))
+    wait(5)
+    CollectNearbyCollectibles(30)
+    TweenToPosition(Vector3.new(232.40354919433594, 68.44718170166016, -187.8707733154297))
+    wait(5)
+    CollectNearbyCollectibles(30)
+end
+
+local function FarmSpider()
+    TweenToPosition(Vector3.new(-53.829627990722656, 20.447189331054688, -12.197813987731934))
+    wait(5)
+    CollectNearbyCollectibles(30)
+end
+
+local function FarmWerewolf()
+    TweenToPosition(Vector3.new(-189.1374969482422, 68.44718170166016, -144.57391357421875))
+    wait(5)
+    CollectNearbyCollectibles(30)
+end
+
+local function FarmScorpions()
+    TweenToPosition(Vector3.new(-329.4551696777344, 20.397192001342773, 128.63780212402344))
+    wait(5)
+    CollectNearbyCollectibles(30)
+end
+
+local function FarmMantises()
+    TweenToPosition(Vector3.new(-328.6845397949219, 68.44718170166016, -171.331787109375))
+    wait(5)
+    CollectNearbyCollectibles(30)
+    TweenToPosition(Vector3.new(262.6548156738281, 68.44718170166016, -221.94320678710938))
+    wait(5)
+    CollectNearbyCollectibles(30)
+end
+
+local function StartAutoFarm()
+    spawn(function()
+        while MonstersAutoFarm do
+            local currentTime = tick()
+            local farmed = false
+
+            for _, monster in ipairs({"Werewolf", "Scorpions", "Mantises", "Spider", "Beetles", "LadyBugs"}) do
+                if table.find(MonstersToFarm, monster) then
+                    if currentTime - lastFarmTime[monster] >= cooldowns[monster] then
+                        lastFarmTime[monster] = currentTime
+                        if monster == "LadyBugs" then
+                            FarmLadyBugs()
+                        elseif monster == "Beetles" then
+                            FarmBeetles()
+                        elseif monster == "Spider" then
+                            FarmSpider()
+                        elseif monster == "Werewolf" then
+                            FarmWerewolf()
+                        elseif monster == "Scorpions" then
+                            FarmScorpions()
+                        elseif monster == "Mantises" then
+                            FarmMantises()
+                        end
+                        farmed = true
+                        break
+                    end
+                end
+            end
+
+            if not farmed then
+                TweenToPosition(restingPosition)
+            end
+
+            wait(1)
+        end
+    end)
+end
+
+CombatTab:CreateDropdown({
+    Name = "Monsters to auto farm",
+    Options = {"LadyBugs", "Beetles", "Spider", "Werewolf", "Scorpions", "Mantises"},
+    CurrentOption = MonstersToFarm,
+    MultiSelection = true,
+    Flag = "MonstersToFarm",
+    Callback = function(Option)
+        MonstersToFarm = Option or {}
+    end,
+})
+
+CombatTab:CreateToggle({
+    Name = "Start Monster Auto Farm",
+    CurrentValue = false,
+    Flag = "MonsterAutoFarm",
+    Callback = function(Value)
+        MonstersAutoFarm = Value
+        if Value then
+            StartAutoFarm()
+        end
+    end,
+})
