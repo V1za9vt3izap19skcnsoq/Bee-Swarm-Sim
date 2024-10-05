@@ -1,1 +1,964 @@
+local function claimHives()
+    for i = 6, 1, -1 do
+        local args = {
+            [1] = i
+        }
+        game:GetService("ReplicatedStorage").Events.ClaimHive:FireServer(unpack(args))
+        wait(0.5)
+    end
+end
 
+claimHives()
+
+local ArrayField = loadstring(game:HttpGet("https://raw.githubusercontent.com/Hosvile/Refinement/main/MC%3AArrayfield%20Library"))()
+
+local Window = ArrayField:CreateWindow({
+    Name = "Rinns Hub Bee Swarm Sim",
+    LoadingTitle = "Rinns Hub Bee Swarm Sim",
+    LoadingSubtitle = "Code by Rinn Ui by Sirius Ui remake by Hosvile",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "RinnsHubConfigs",
+        FileName = "RinnsHubBss"
+    },
+    Discord = {
+        Enabled = true,
+        Invite = "Mt9F5nc8Tg",
+        RememberJoins = false
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "ArrayField",
+        Subtitle = "Key System",
+        Note = "Join the discord (discord.gg/sirius)",
+        FileName = "ArrayFieldsKeys",
+        SaveKey = false,
+        GrabKeyFromSite = false,
+        Key = {"Hello", 'Bye'},
+        Actions = {
+            [1] = {
+                Text = 'Click here to copy the key link',
+                OnPress = function() end,
+            }
+        },
+    }
+})
+
+local Tab = Window:CreateTab("Main Tab", 4483362458)
+
+local autoDigEnabled = false
+local stopAtCapacity = false
+local autoDigConnection
+
+Tab:CreateToggle({
+    Name = "Auto Dig",
+    Info = {
+        Title = 'Auto Dig',
+        Image = '12735851647',
+        Description = 'Auto Digs For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoDig",
+    Callback = function(Value)
+        autoDigEnabled = Value
+        if autoDigEnabled then
+            autoDigConnection = game:GetService("RunService").Stepped:Connect(function()
+                local player = game.Players.LocalPlayer
+                local coreStats = player:WaitForChild("CoreStats")
+                local capacity = coreStats:WaitForChild("Capacity").Value
+                local pollen = coreStats:WaitForChild("Pollen").Value
+
+                if pollen < capacity or not stopAtCapacity then
+                    game:GetService("ReplicatedStorage").Events.ToolCollect:FireServer()
+                end
+            end)
+        else
+            if autoDigConnection then
+                autoDigConnection:Disconnect()
+                autoDigConnection = nil
+            end
+        end
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Stop digging when pollen is full",
+    Info = {
+        Title = 'Stop digging when pollen is full',
+        Image = '12735851647',
+        Description = 'Stops auto digging when your pollen reached the max limit',
+    },
+    CurrentValue = false,
+    Flag = "StopAtCapacity",
+    Callback = function(Value)
+        stopAtCapacity = Value
+    end,
+})
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local tweenService = game:GetService("TweenService")
+local selectedField = "SunFlower Field"
+local collectiblesFolder = game.Workspace:WaitForChild("Collectibles")
+local cloudsFolder = game.Workspace:WaitForChild("Clouds")
+local monstersFolder = game.Workspace:WaitForChild("Monsters")
+
+local coreStats = player:WaitForChild("CoreStats")
+local capacity = coreStats:WaitForChild("Capacity")
+local pollen = coreStats:WaitForChild("Pollen")
+
+local autoFarmEnabled = false
+local useSprinklersEnabled = true
+local ignoreHoneyTokensEnabled = false
+local farmUnderCloudsEnabled = false
+local hasPlacedSprinklers = false
+local tweenSpeed = 80
+local collectibleRange = 40
+local fieldPositions = {
+    ["SunFlower Field"] = Vector3.new(-209.692, 4.405, 161.513),
+    ["Dandelion Field"] = Vector3.new(-46.345, 4.405, 222.636),
+    ["Mushroom Field"] = Vector3.new(-94.600, 4.405, 112.418),
+    ["Clover Field"] = Vector3.new(154.985, 33.905, 191.154),
+    ["Blue Flower"] = Vector3.new(152.831, 4.405, 100.395),
+    ["Bamboo Field"] = Vector3.new(134.668, 20.405, -24.929),
+    ["Spider Field"] = Vector3.new(-41.872, 20.405, -11.595),
+    ["Strawberry Field"] = Vector3.new(-182.874, 20.405, -15.212),
+    ["Stump Field"] = Vector3.new(424.508, 96.453, -174.492),
+    ["Pinapple Field"] = Vector3.new(255.599, 68.474, -211.378),
+    ["Cactus Field"] = Vector3.new(-184.026, 68.474, -103.472),
+    ["Pumpkin Field"] = Vector3.new(-187.553, 68.474, -189.296),
+    ["Pine Tree Field"] = Vector3.new(-326.483, 68.474, -189.874),
+    ["Mountain Top Field"] = Vector3.new(85.72864532470703, 176.4743194580078, -159.75270080566406),
+    ["Coconut Field"] = Vector3.new(-263.2635192871094, 71.92432403564453, 461.55902099609375),
+    ["Pepper Field"] = Vector3.new(-504.0063171386719, 123.67584228515625, 535.453125)
+}
+
+local function tweenToPosition(position)
+    local distance = (position - humanoidRootPart.Position).Magnitude
+    local tweenInfo = TweenInfo.new(distance / tweenSpeed, Enum.EasingStyle.Linear)
+    local tween = tweenService:Create(humanoidRootPart, tweenInfo, {CFrame = CFrame.new(position)})
+    tween:Play()
+    tween.Completed:Wait()
+end
+
+local function walkToPosition(position)
+    humanoid:MoveTo(position)
+    humanoid.MoveToFinished:Wait()
+end
+
+local function placeSprinkler()
+    local args = {
+        [1] = {
+            ["Name"] = "Sprinkler Builder"
+        }
+    }
+    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+end
+
+local function walkAndPlaceSprinkler(direction)
+    walkToPosition(humanoidRootPart.Position + direction)
+    wait(0.3)
+    placeSprinkler()
+end
+
+local function farmCollectibles()
+    while autoFarmEnabled do
+        for _, collectible in pairs(collectiblesFolder:GetChildren()) do
+            if (collectible.Position - humanoidRootPart.Position).Magnitude <= collectibleRange then
+                if ignoreHoneyTokensEnabled and collectible.Color == Color3.fromRGB(223, 187, 27) then
+                else
+                    walkToPosition(collectible.Position)
+                end
+            end
+        end
+        wait(0.1)
+    end
+end
+
+local function followPlane(plane)
+    local startTime = tick()
+    while tick() - startTime < 4 do
+        walkToPosition(plane.Position)
+        wait(0.1)
+    end
+end
+
+local function checkAndFarmClouds()
+    while farmUnderCloudsEnabled do
+        local planeFound = false
+        for _, cloudInstance in pairs(cloudsFolder:GetChildren()) do
+            local plane = cloudInstance:FindFirstChild("Plane")
+            if plane and (plane.Position - humanoidRootPart.Position).Magnitude <= 53 then
+                planeFound = true
+                followPlane(plane)
+                break
+            end
+        end
+        if not planeFound then
+            farmCollectibles()
+        end
+        wait(6)
+    end
+end
+
+local function farmSelectedField()
+    local targetPosition = fieldPositions[selectedField]
+    if targetPosition then
+        if (targetPosition - humanoidRootPart.Position).Magnitude > 40 then
+            tweenToPosition(targetPosition)
+        end
+
+        if useSprinklersEnabled and not hasPlacedSprinklers then
+            placeSprinkler()
+            walkAndPlaceSprinkler(Vector3.new(34, 0, 0))
+            walkAndPlaceSprinkler(Vector3.new(0, 0, -34))
+            walkAndPlaceSprinkler(Vector3.new(-34, 0, 0))
+            hasPlacedSprinklers = true
+        end
+
+        if farmUnderCloudsEnabled then
+            checkAndFarmClouds()
+        else
+            farmCollectibles()
+        end
+    end
+end
+
+local function monitorPollen()
+    while autoFarmEnabled do
+        if pollen.Value >= capacity.Value then
+            autoFarmEnabled = false
+            print("Capacity full")
+
+            local spawnPos = player:WaitForChild("SpawnPos").Value
+            local targetPosition
+
+            if spawnPos == CFrame.new(-113.343842, 4.77502441, 331.081543) then
+                targetPosition = Vector3.new(-112.93324279785156, 6.3822245597839355, 332.3712463378906)
+            elseif spawnPos == CFrame.new(-149.971176, 4.77502441, 331.07901) then
+                targetPosition = Vector3.new(-149.53021240234375, 6.382225036621094, 330.51385498046875)
+            elseif spawnPos == CFrame.new(-186.59848, 4.77502537, 331.076782) then
+                targetPosition = Vector3.new(-187.1492919921875, 6.3822245597839355, 331.0786437988281)
+            elseif spawnPos == CFrame.new(-76.7165298, 4.77502441, 331.083832) then
+                targetPosition = Vector3.new(-77.00697326660156, 6.382225036621094, 330.8248291015625)
+            elseif spawnPos == CFrame.new(-40.0892334, 4.77502441, 331.086121) then
+                targetPosition = Vector3.new(-40.500633239746094, 6.3822245597839355, 328.7098388671875)
+            elseif spawnPos == CFrame.new(-3.46192288, 4.77502537, 331.088379) then
+                targetPosition = Vector3.new(-2.5000572204589844, 6.3822245597839355, 330.283447265625)
+            else
+                targetPosition = spawnPos.Position
+            end
+
+            tweenToPosition(targetPosition)
+
+            local args = {
+                [1] = "ToggleHoneyMaking"
+            }
+            game:GetService("ReplicatedStorage").Events.PlayerHiveCommand:FireServer(unpack(args))
+
+            repeat
+                wait(1)
+            until pollen.Value == 0
+
+            wait(5)
+
+            local fieldPosition = fieldPositions[selectedField]
+            if fieldPosition then
+                tweenToPosition(fieldPosition)
+                farmCollectibles()
+            end
+
+            autoFarmEnabled = true
+        end
+        wait(0.5)
+    end
+end
+
+Tab:CreateToggle({
+    Name = "Auto Farm Field",
+    Info = {
+        Title = 'Auto Farm Field',
+        Image = '12735851647',
+        Description = 'Auto Farms The Selected Field In The DropDown Below',
+    },
+    CurrentValue = false,
+    Flag = "AutoFarmToggle",
+    Callback = function(Value)
+        autoFarmEnabled = Value
+        hasPlacedSprinklers = false
+        print(Value)
+        if Value then
+            spawn(function()
+                monitorPollen()
+            end)
+            while autoFarmEnabled do
+                farmSelectedField()
+                wait(1)
+            end
+        end
+    end,
+})
+
+Tab:CreateDropdown({
+    Name = "Auto Farm Field",
+    Options = {
+        "SunFlower Field", "Dandelion Field", "Mushroom Field", "Clover Field", "Blue Flower", "Bamboo Field",
+        "Spider Field", "Strawberry Field", "Stump Field", "Pinapple Field", "Cactus Field", "Pumpkin Field",
+        "Pine Tree Field", "Mountain Top Field", "Coconut Field", "Pepper Field"
+    },
+    CurrentOption = "SunFlower Field",
+    Flag = "AutoFarmDropdown",
+    Callback = function(Option)
+        selectedField = Option
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "Token Range",
+    Range = {1, 100},
+    Increment = 1,
+    Suffix = " studs",
+    CurrentValue = collectibleRange,
+    Flag = "CollectibleRangeSlider",
+    Callback = function(Value)
+        collectibleRange = Value
+    end,
+})
+
+local rangePart
+
+Tab:CreateToggle({
+    Name = "Token Range Visualizer",
+    CurrentValue = false,
+    Flag = "ShowCollectiblesRangeToggle",
+    Callback = function(Value)
+        if Value then
+            rangePart = Instance.new("Part")
+            rangePart.Size = Vector3.new(collectibleRange * 2, 1, collectibleRange * 2)
+            rangePart.Color = Color3.fromRGB(255, 0, 0)
+            rangePart.Transparency = 0.5
+            rangePart.Anchored = true
+            rangePart.CanCollide = false
+            rangePart.Parent = workspace
+        else
+            if rangePart then
+                rangePart:Destroy()
+                rangePart = nil
+            end
+        end
+    end,
+})
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if rangePart and humanoidRootPart then
+        rangePart.Size = Vector3.new(collectibleRange * 2, 1, collectibleRange * 2)
+        rangePart.CFrame = humanoidRootPart.CFrame
+    end
+end)
+
+Tab:CreateToggle({
+    Name = "Use Sprinklers",
+    Info = {
+        Title = 'Use Sprinklers',
+        Image = '12735851647',
+        Description = 'Makes The Auto Use Sprinklers While Auto Farming',
+    },
+    CurrentValue = true,
+    Flag = "UseSprinklersToggle",
+    Callback = function(Value)
+        useSprinklersEnabled = Value
+        print(Value)
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Ignore Honey Tokens",
+    Info = {
+        Title = 'Ignore Honey Tokens',
+        Image = '12735851647',
+        Description = 'Auto Farmers Collect Everything But Honey Tokens',
+    },
+    CurrentValue = false,
+    Flag = "IgnoreHoneyTokensToggle",
+    Callback = function(Value)
+        ignoreHoneyTokensEnabled = Value
+        print(Value)
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Farm Under Clouds",
+    Info = {
+        Title = 'Farm Under Clouds',
+        Image = '12735851647',
+        Description = 'Makes The Auto Farm Also Farm Under Clouds For the Pollen boost',
+    },
+    CurrentValue = false,
+    Flag = "FarmUnderCloudsToggle",
+    Callback = function(Value)
+        farmUnderCloudsEnabled = Value
+        print(Value)
+    end,
+})
+
+local TweenService = game:GetService("TweenService")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+
+local sunflowersEnabled = false
+local blueberriesEnabled = false
+local pineapplesEnabled = false
+local strawberriesEnabled = false
+
+local function tweenToPosition(targetPosition, speed, isEnabled)
+    if not character or not character.Parent or not isEnabled() then
+        return -- Stop if character is not loaded or exists anymore or toggle is off
+    end
+    
+    local tweenInfo = TweenInfo.new((humanoidRootPart.Position - targetPosition).magnitude / speed, Enum.EasingStyle.Linear)
+    local tween = TweenService:Create(humanoidRootPart, tweenInfo, {CFrame = CFrame.new(targetPosition)})
+    
+    tween:Play()
+    local connection
+    connection = humanoid.MoveToFinished:Connect(function()
+        if connection then connection:Disconnect() end
+        if tween then tween:Cancel() end
+    end)
+
+    tween.Completed:Wait()
+end
+
+local function getClosestCollectible(radius)
+    local closestCollectible = nil
+    local shortestDistance = radius
+
+    local collectibles = game.Workspace.Collectibles:GetChildren()
+    for _, collectible in pairs(collectibles) do
+        local distance = (collectible.Position - humanoidRootPart.Position).magnitude
+        if distance <= shortestDistance then
+            closestCollectible = collectible
+            shortestDistance = distance
+        end
+    end
+
+    return closestCollectible
+end
+
+local function walkToCollectibles(radius, duration, isEnabled)
+    local endTime = tick() + duration
+    while tick() < endTime and isEnabled() do
+        if not character or not character.Parent then return end -- Stop if character is not loaded or exists anymore
+        
+        local collectible = getClosestCollectible(radius)
+        while collectible and isEnabled() do
+            if not collectible.Parent or (collectible.Position - humanoidRootPart.Position).magnitude > radius then
+                break -- Collectible disappeared or is out of range
+            end
+            humanoid:MoveTo(collectible.Position)
+            humanoid.MoveToFinished:Wait()
+            if not isEnabled() then return end -- Stop if the toggle is off
+            collectible = getClosestCollectible(radius)
+        end
+        wait(0.1) -- Slight delay to prevent overloading
+    end
+end
+
+local function continueAutoFarm(farmFunction, isEnabled)
+    if not character or not character.Parent then
+        character = player.Character or player.CharacterAdded:Wait()
+        humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+        humanoid = character:WaitForChild("Humanoid")
+        wait(1) -- Wait a second to ensure everything is loaded
+    end
+    if isEnabled() then
+        farmFunction(isEnabled)
+    end
+end
+
+local function autoFarmSunflowers()
+    while sunflowersEnabled do
+        continueAutoFarm(function(isEnabled)
+            if not isEnabled() then return end
+            tweenToPosition(Vector3.new(-203.70652770996094, 4.404853343963623, 178.85760498046875), 75, isEnabled)
+            walkToCollectibles(50, 6, isEnabled)
+            wait(1)
+        end, function() return sunflowersEnabled end)
+    end
+end
+
+local function autoFarmBlueberries()
+    while blueberriesEnabled do
+        continueAutoFarm(function(isEnabled)
+            if not isEnabled() then return end
+            tweenToPosition(Vector3.new(168.28094482421875, 33.904850006103516, 167.86114501953125), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(30, 6, isEnabled)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(85.03308868408203, 4.404853820800781, 89.11113739013672), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(20, 6, isEnabled)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(130.7384490966797, 20.404850006103516, -45.26832580566406), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(30, 6, isEnabled)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(-132.402099609375, 230.97586059570312, -248.17796325683594), 75, isEnabled)
+            wait(1)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(233.00608825683594, 68.40484619140625, -224.40219116210938), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(25, 6, isEnabled)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(-329.731689453125, 68.40483093261719, -184.5319366455078), 75, isEnabled)
+            wait(6)
+            walkToCollectibles(50, 270, isEnabled) -- Collectibles within a 50-stud radius for 4 minutes and 30 seconds (270 seconds)
+        end, function() return blueberriesEnabled end)
+    end
+end
+
+local function autoFarmPineapples()
+    while pineapplesEnabled do
+        continueAutoFarm(function(isEnabled)
+            if not isEnabled() then return end
+            tweenToPosition(Vector3.new(258.95928955078125, 68.40484619140625, -208.61239624023438), 75, isEnabled)
+            wait(4)
+            walkToCollectibles(40, 270, isEnabled) -- Collectibles within a 40-stud radius for 4 minutes and 30 seconds (270 seconds)
+        end, function() return pineapplesEnabled end)
+    end
+end
+
+local function autoFarmStrawberries()
+    while strawberriesEnabled do
+        continueAutoFarm(function(isEnabled)
+            if not isEnabled() then return end
+            tweenToPosition(Vector3.new(-92.69772338867188, 4.4048542976379395, 111.75782775878906), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(50, 6, isEnabled)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(140.85592651367188, 33.904842376708984, 204.25721740722656), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(50, 6, isEnabled)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(-182.0719757080078, 20.40485382080078, -27.168325424194336), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(50, 6, isEnabled)
+            if not isEnabled() then return end
+
+            tweenToPosition(Vector3.new(-326.2380065917969, 20.354854583740234, 127.59237670898438), 75, isEnabled)
+            wait(5)
+            walkToCollectibles(50, 270, isEnabled) -- Collectibles within a 50-stud radius for 4 minutes and 30 seconds (270 seconds)
+        end, function() return strawberriesEnabled end)
+    end
+end
+
+local Label = Tab:CreateLabel("Auto Farm Materials Section, only have 1 on at the time doesn't work with auto farm", Section)
+Tab:CreateToggle({
+    Name = "Auto Farm Sunflower seeds",
+    Info = {
+        Title = 'Auto Farm SunFlowers seeds',
+        Image = '12735851647',
+        Description = 'Auto Farms SunFlower Seeds For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoFarmSunflower", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        sunflowersEnabled = Value
+        if Value then
+            spawn(autoFarmSunflowers)
+        end
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Auto Farm BlueBerrys",
+    Info = {
+        Title = 'Auto Farm BlueBerrys',
+        Image = '12735851647',
+        Description = 'Auto Farm BlueBerrys',
+    },
+    CurrentValue = false,
+    Flag = "AutoFarmBlueBerrys", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        blueberriesEnabled = Value
+        if Value then
+            spawn(autoFarmBlueberries)
+        end
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Auto Farm Pineapples",
+    Info = {
+        Title = 'Auto Farm Pineapples',
+        Image = '12735851647',
+        Description = 'Auto Farms Pineapples For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoFarmPineapples", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        pineapplesEnabled = Value
+        if Value then
+            spawn(autoFarmPineapples)
+        end
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Auto Farm StrawBerrys",
+    Info = {
+        Title = 'Auto Farm StrawBerrys',
+        Image = '12735851647',
+        Description = 'Auto Farms StrawBerrys For You',
+    },
+    CurrentValue = false,
+    Flag = "AutofarmStrawBerrys", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        strawberriesEnabled = Value
+        if Value then
+            spawn(autoFarmStrawberries)
+        end
+    end,
+})
+
+local EspTab = Window:CreateTab("Esp Tab", 4483362458)
+
+local players = game:GetService("Players")
+local runService = game:GetService("RunService")
+local workspace = game:GetService("Workspace")
+
+local drawnLines = {} -- Table to store the drawn lines for players
+local stickerLines = {} -- Table to store the drawn lines for stickers
+
+local lineColor = Color3.new(1, 0, 0) -- Default player line color (red)
+local stickerLineColor = Color3.new(0, 1, 0) -- Default sticker line color (green)
+
+-- Function to create a line to a player
+local function createLineToPlayer(player)
+    -- Skip if the player is the local player
+    if player == players.LocalPlayer then return end
+    
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local line = Drawing.new("Line")
+        line.Thickness = 2
+        line.Color = lineColor
+        line.Transparency = 1
+
+        local connection
+        connection = runService.RenderStepped:Connect(function()
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local screenPosition, onScreen = workspace.CurrentCamera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+                if onScreen then
+                    line.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
+                    line.To = Vector2.new(screenPosition.X, screenPosition.Y)
+                    line.Visible = true
+                else
+                    line.Visible = false
+                end
+            else
+                line.Visible = false
+            end
+        end)
+
+        drawnLines[player] = {Line = line, Connection = connection}
+    end
+end
+
+-- Function to remove a line from a player
+local function removeLineFromPlayer(player)
+    if drawnLines[player] then
+        drawnLines[player].Line:Remove()
+        drawnLines[player].Connection:Disconnect()
+        drawnLines[player] = nil
+    end
+end
+
+-- Handle player joining
+local function onPlayerAdded(player)
+    if EspTab.Flags and EspTab.Flags["PlayerLine"] then
+        createLineToPlayer(player)
+    end
+end
+
+-- Handle player leaving
+local function onPlayerRemoving(player)
+    removeLineFromPlayer(player)
+end
+
+-- Listen for player join and leave events
+players.PlayerAdded:Connect(onPlayerAdded)
+players.PlayerRemoving:Connect(onPlayerRemoving)
+
+-- Create the toggle for Player Line Esp
+EspTab:CreateToggle({
+    Name = "Players Line Esp",
+    Info = {
+        Title = 'Players Line Esp',
+        Image = '12735851647',
+        Description = 'Draws A Line To Every Player ez',
+    },
+    CurrentValue = false,
+    Flag = "PlayerLine",
+    Callback = function(Value)
+        if Value then
+            for _, player in ipairs(players:GetPlayers()) do
+                createLineToPlayer(player)
+            end
+        else
+            for _, data in pairs(drawnLines) do
+                data.Line:Remove()
+                data.Connection:Disconnect()
+            end
+            drawnLines = {}
+        end
+    end,
+})
+
+-- Create the color picker for player line color
+EspTab:CreateColorPicker({
+    Name = "Player Line Color Picker",
+    Color = lineColor,
+    Flag = "LineColorPicker",
+    Callback = function(Value)
+        lineColor = Value
+        for _, data in pairs(drawnLines) do
+            data.Line.Color = lineColor
+        end
+    end,
+})
+
+-- Function to create a line to a sticker
+local function createLineToSticker(sticker)
+    if sticker.Transparency == 0 then
+        local line = Drawing.new("Line")
+        line.Thickness = 2
+        line.Color = stickerLineColor
+        line.Transparency = 1
+
+        local connection
+        connection = runService.RenderStepped:Connect(function()
+            local screenPosition, onScreen = workspace.CurrentCamera:WorldToViewportPoint(sticker.Position)
+            if onScreen and sticker.Transparency == 0 then
+                line.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
+                line.To = Vector2.new(screenPosition.X, screenPosition.Y)
+                line.Visible = true
+            else
+                line.Visible = false
+                if sticker.Transparency == 1 then
+                    removeLineFromSticker(sticker)
+                end
+            end
+        end)
+
+        stickerLines[sticker] = {Line = line, Connection = connection}
+    end
+end
+
+-- Function to remove a line from a sticker
+local function removeLineFromSticker(sticker)
+    if stickerLines[sticker] then
+        stickerLines[sticker].Line:Remove()
+        stickerLines[sticker].Connection:Disconnect()
+        stickerLines[sticker] = nil
+    end
+end
+
+-- Function to update sticker lines constantly
+local function updateStickerLines()
+    while EspTab.Flags and EspTab.Flags["StickerLine"] do
+        for _, sticker in pairs(workspace.HiddenStickers:GetChildren()) do
+            if sticker.Transparency == 0 and not stickerLines[sticker] then
+                createLineToSticker(sticker)
+            elseif sticker.Transparency == 1 and stickerLines[sticker] then
+                removeLineFromSticker(sticker)
+            end
+        end
+        wait(0.1) -- Check every 0.1 seconds
+    end
+end
+
+-- Create the toggle for Sticker Line Esp
+EspTab:CreateToggle({
+    Name = "Sticker Line Esp",
+    Info = {
+        Title = 'Sticker Line Esp',
+        Image = '12735851647',
+        Description = 'Draws A Line To Every Visible Sticker',
+    },
+    CurrentValue = false,
+    Flag = "StickerLine",
+    Callback = function(Value)
+        if Value then
+            spawn(updateStickerLines)
+        else
+            for _, data in pairs(stickerLines) do
+                data.Line:Remove()
+                data.Connection:Disconnect()
+            end
+            stickerLines = {}
+        end
+    end,
+})
+
+-- Create the color picker for sticker line color
+EspTab:CreateColorPicker({
+    Name = "Sticker Line Color Picker",
+    Color = stickerLineColor,
+    Flag = "StickerLineColorPicker",
+    Callback = function(Value)
+        stickerLineColor = Value
+        for _, data in pairs(stickerLines) do
+            data.Line.Color = stickerLineColor
+        end
+    end,
+})
+
+local CombatTab = Window:CreateTab("Combat Tab", 4483362458)
+
+local ItemsTab = Window:CreateTab("Items Tab", 4483362458) -- Title, Image
+
+-- Variables to control the loops
+local AutoGumDropLoop
+local AutoJellyBeansLoop
+local AutoMagicBeansLoop
+local AutoCoconutLoop
+local AutoBlueExtractLoop
+local AutoRedExtractLoop
+local AutoGlueLoop
+local AutoOilLoop
+local AutoEnzymesLoop
+local AutoStingerLoop
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use GumDrops",
+    Info = {
+        Title = 'Auto Use GumDrops',
+        Image = '12735851647',
+        Description = 'Auto Uses GumDrops For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoGumDrop", 
+    Callback = function(Value)
+        if Value then
+            AutoGumDropLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Gumdrops"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(2)
+                end
+            end)
+        else
+            if AutoGumDropLoop then
+                task.cancel(AutoGumDropLoop)
+                AutoGumDropLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Jelly Beans",
+    Info = {
+        Title = 'Auto Use Jelly Beans',
+        Image = '12735851647',
+        Description = 'Auto Uses Jelly Beans For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoJellyBeans", 
+    Callback = function(Value)
+        if Value then
+            AutoJellyBeansLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Jelly Beans"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(30)
+                end
+            end)
+        else
+            if AutoJellyBeansLoop then
+                task.cancel(AutoJellyBeansLoop)
+                AutoJellyBeansLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Magic Beans",
+    Info = {
+        Title = 'Auto Use Magic Beans',
+        Image = '12735851647',
+        Description = 'Auto Uses Magic Beans For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoMagicBeans", 
+    Callback = function(Value)
+        if Value then
+            AutoMagicBeansLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Magic Bean"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(5)
+                end
+            end)
+        else
+            if AutoMagicBeansLoop then
+                task.cancel(AutoMagicBeansLoop)
+                AutoMagicBeansLoop = nil
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = "Auto Use Coconut",
+    Info = {
+        Title = 'Auto Use Coconut',
+        Image = '12735851647',
+        Description = 'Auto Uses Coconut For You',
+    },
+    CurrentValue = false,
+    Flag = "AutoCoconut", 
+    Callback = function(Value)
+        if Value then
+            AutoCoconutLoop = task.spawn(function()
+                while true do
+                    local args = {
+                        [1] = {
+                            ["Name"] = "Coconut"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                    task.wait(10)
+                end
+            end)
+        else
+            if AutoCoconutLoop then
+                task.cancel(AutoCoconutLoop)
+                AutoCoconutLoop = nil
+            end
+        end
+    end,
+})
